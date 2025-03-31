@@ -11,6 +11,7 @@ class NIH_Dataset(Dataset):
             data_dir (string): Directory with all the images.
             transform (callable, optional): Optional transform to be applied
                 on a sample.
+            data_type (string): Type of data to load ('train' or 'test').
         """
         self.data_dir = data_dir
         self.transform = transform
@@ -18,6 +19,11 @@ class NIH_Dataset(Dataset):
         self.train_list_file = os.path.join(data_dir, 'train_val_list.txt')
         self.test_list_file = os.path.join(data_dir, 'test_list.txt')
         self.ground_truth_file = os.path.join(data_dir, 'Data_Entry_2017.csv')
+        self.classes = [
+            "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass",
+            "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema",
+            "Emphysema", "Fibrosis", "Pleural_Thickening", "Hernia", "No Finding"
+        ]
 
         # image folders
         self.image_dir = [
@@ -56,6 +62,17 @@ class NIH_Dataset(Dataset):
             for _, row in ground_truth_df.iterrows()
         }
 
+    def encode_labels(self, labels):
+        """
+        Encode the labels into a binary vector.
+        """
+        label_vector = np.zeros(len(self.classes), dtype=int)
+        for label in labels:
+            if label in self.classes:
+                index = self.classes.index(label)
+                label_vector[index] = 1
+        return label_vector
+
     def __len__(self):
         return len(self.image_files)
 
@@ -67,5 +84,6 @@ class NIH_Dataset(Dataset):
             image = self.transform(image)
 
         labels = self.ground_truth.get(os.path.basename(img_path), [])
+        encoded_labels = self.encode_labels(labels)
 
-        return image, labels
+        return image, labels, encoded_labels
