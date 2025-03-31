@@ -16,7 +16,7 @@ class NIH_Dataset(Dataset):
         self.data_dir = data_dir
         self.transform = transform
         self.data_type = data_type
-        self.train_list_file = os.path.join(data_dir, 'train_val_list.txt')
+        self.train_list_file = os.path.join(data_dir, 'temp.txt')
         self.test_list_file = os.path.join(data_dir, 'test_list.txt')
         self.ground_truth_file = os.path.join(data_dir, 'Data_Entry_2017.csv')
         self.classes = [
@@ -75,6 +75,9 @@ class NIH_Dataset(Dataset):
 
     def __len__(self):
         return len(self.image_files)
+    
+    def num_classes(self):
+        return len(self.classes)
 
     def __getitem__(self, idx):
         img_path = self.image_files[idx]
