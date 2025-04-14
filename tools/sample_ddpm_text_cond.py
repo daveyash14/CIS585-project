@@ -77,13 +77,15 @@ def sample(model, scheduler, train_config, diffusion_model_config,
         else:
             ims = x0_pred
         
+
         ims = torch.clamp(ims, -1., 1.).detach().cpu()
         ims = (ims + 1) / 2
+
+        generated_images.append(ims)
+
         grid = make_grid(ims, nrow=1)
         img = torchvision.transforms.ToPILImage()(grid)
         
-        generated_images.append(img)
-
         if not os.path.exists(os.path.join(train_config['task_name'], 'cond_text_samples')):
             os.mkdir(os.path.join(train_config['task_name'], 'cond_text_samples'))
         img.save(os.path.join(train_config['task_name'], 'cond_text_samples', 'x0_{}.png'.format(i)))
